@@ -1,0 +1,56 @@
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
+const jsonwebtoken = require("jsonwebtoken");
+
+const movieRouter = require("./routes/movie_routes");
+const { connectDB } = require("./config/database");
+const userRouter = require("./routes/user_routes");
+const reviewRouter = require("./routes/review_routes");
+const chatRouter = require("./routes/review_routes");
+const messageRoutes = require('./routes/message_routes');
+
+const app = express();
+
+const corsConfig = {
+  credentials: true,
+  origin: true,
+};
+
+//define os middlewares
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*"); // Allow requests from any origin
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+
+  // For preflight requests (OPTIONS request)
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  next();
+});
+app.use(cookieParser());
+app.use(express.json());
+
+//define o ponto de partida da aplicação
+
+const PORT = process.env.PORT || 3000;
+//faz a conexão com o banco de dados
+connectDB();
+
+//rotas
+// app.use('/products', router);
+app.use("/user", userRouter);
+app.use("/reviews", reviewRouter);
+app.use("/movies", movieRouter);
+app.use("/chat", chatRouter);
+app.use("/mensagem", messageRoutes);
+
+//define o ouvinte
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
